@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react"
 import axios from "axios"
 import { Typography } from "@mui/material"
-import { styled } from '@mui/material/styles';
-import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
+import { styled } from "@mui/material/styles"
+import Tooltip, { TooltipProps, tooltipClasses } from "@mui/material/Tooltip"
 
 const Dynamic = () => {
   const [playList, setPlayList] = useState([])
+  const [miniPlayList, setMiniPlayList] = useState([])
   const [videoIndex, setVideoIndex] = useState(0)
 
   const YOUTUBE_API_KEY = process.env.REACT_APP_YOUTUBE_API_KEY
@@ -23,6 +24,7 @@ const Dynamic = () => {
       )
       console.log(data?.items)
       setPlayList(data?.items)
+        setMiniPlayList(data?.items.slice(1))
     } catch (error) {
       console.warn(error.message)
       console.error(error)
@@ -33,17 +35,17 @@ const Dynamic = () => {
     getPlaylist(SamplePlayListID)
   }, [])
 
-//   mui styles elements
-const LightTooltip = styled(({ className, ...props }) => (
+  //   mui styles elements
+  const LightTooltip = styled(({ className, ...props }) => (
     <Tooltip {...props} classes={{ popper: className }} />
   ))(({ theme }) => ({
     [`& .${tooltipClasses.tooltip}`]: {
       backgroundColor: theme.palette.common.white,
-      color: 'rgba(0, 0, 0, 0.87)',
+      color: "rgba(0, 0, 0, 0.87)",
       boxShadow: theme.shadows[1],
-      fontSize: 18, // cutomize font size
-    },
-  }));
+      fontSize: 18 // cutomize font size
+    }
+  }))
 
   return (
     <div>
@@ -56,15 +58,32 @@ const LightTooltip = styled(({ className, ...props }) => (
       {/* play first video */}
       <h2>Fisrt video</h2>
       {playList.length > 0 && (
-        <iframe
-          width="560"
-          height="315"
-          src={`https://www.youtube.com/embed/${playList[videoIndex].snippet.resourceId.videoId}`}
-          title="YouTube video player"
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        ></iframe>
+        <div>
+          <iframe
+            width="560"
+            height="315"
+            src={`https://www.youtube.com/embed/${playList[videoIndex].snippet.resourceId.videoId}`}
+            title="YouTube video player"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          ></iframe>
+          {console.log("kai", playList[videoIndex])}
+          <LightTooltip title={playList[videoIndex]?.snippet?.title}>
+            <Typography
+              variant="h5"
+              component="h2"
+              style={{
+                width: "310px",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap"
+              }}
+            >
+              {videoIndex + 1}. {playList[videoIndex]?.snippet?.title}
+            </Typography>
+          </LightTooltip>
+        </div>
       )}
 
       <br />
@@ -72,16 +91,17 @@ const LightTooltip = styled(({ className, ...props }) => (
 
       <h2>All Video from Playlist</h2>
       {/* play all videos */}
-      {playList.length > 0 && (
+      {miniPlayList.length > 0 && (
         <div>
-          {playList.map((item, index) => {
+          {/* {playList.slice(1)} */}
+          {miniPlayList.map((item, index) => {
             return (
               <div key={index}>
                 <img
                   src={item.snippet.thumbnails.medium.url}
                   alt="thumbnail"
                   style={{ width: "320px", height: "215px" }}
-                  onClick={() => setVideoIndex(index)}
+                  onClick={() => setVideoIndex(index + 1)}
                 />
 
                 <LightTooltip title={item.snippet.title}>
@@ -103,6 +123,8 @@ const LightTooltip = styled(({ className, ...props }) => (
               </div>
             )
           })}
+
+          {/* remove first item inn paylist then show */}
         </div>
       )}
     </div>
