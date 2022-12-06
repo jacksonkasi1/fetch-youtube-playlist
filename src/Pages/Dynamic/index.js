@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react"
 import axios from "axios"
 import { Typography } from "@mui/material"
+import { styled } from '@mui/material/styles';
+import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 
-const New = () => {
+const Dynamic = () => {
   const [playList, setPlayList] = useState([])
   const [videoIndex, setVideoIndex] = useState(0)
 
@@ -30,6 +32,18 @@ const New = () => {
   useEffect(() => {
     getPlaylist(SamplePlayListID)
   }, [])
+
+//   mui styles elements
+const LightTooltip = styled(({ className, ...props }) => (
+    <Tooltip {...props} classes={{ popper: className }} />
+  ))(({ theme }) => ({
+    [`& .${tooltipClasses.tooltip}`]: {
+      backgroundColor: theme.palette.common.white,
+      color: 'rgba(0, 0, 0, 0.87)',
+      boxShadow: theme.shadows[1],
+      fontSize: 18, // cutomize font size
+    },
+  }));
 
   return (
     <div>
@@ -63,29 +77,27 @@ const New = () => {
           {playList.map((item, index) => {
             return (
               <div key={index}>
-                <iframe
-                  width="290"
-                  height="215"
-                  src={`https://www.youtube.com/embed/${item.snippet.resourceId.videoId}`}
-                  title="YouTube video player"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
+                <img
+                  src={item.snippet.thumbnails.medium.url}
+                  alt="thumbnail"
+                  style={{ width: "320px", height: "215px" }}
                   onClick={() => setVideoIndex(index)}
-                ></iframe>
+                />
 
-                <Typography
-                  variant="h5"
-                  component="h2"
-                  style={{
-                    width: "290px",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap"
-                  }}
-                >
-                  {index + 1}. {item.snippet.title}
-                </Typography>
+                <LightTooltip title={item.snippet.title}>
+                  <Typography
+                    variant="h5"
+                    component="h2"
+                    style={{
+                      width: "310px",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap"
+                    }}
+                  >
+                    {index + 1}. {item.snippet.title}
+                  </Typography>
+                </LightTooltip>
 
                 <br />
               </div>
@@ -97,4 +109,4 @@ const New = () => {
   )
 }
 
-export default New
+export default Dynamic
